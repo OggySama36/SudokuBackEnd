@@ -149,11 +149,7 @@ func main() {
 	http.HandleFunc("/api/sudoku/easy", easyHandler)
 	http.HandleFunc("/api/sudoku/normal", normalHandler)
 	http.HandleFunc("/api/sudoku/hard", hardHandler)
-	fs := http.FileServer(http.Dir("D:/MyFrontend/Sudoku"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "D:/MyFrontend/Sudoku/sudoku.html")
-	})
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
