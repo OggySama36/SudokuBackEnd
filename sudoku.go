@@ -143,12 +143,28 @@ func hardHandler(w http.ResponseWriter, r *http.Request) {
 	board := generateSudoku(28)
 	writeJSON(w, board)
 }
+
+func enableCORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next(w, r)
+	}
+}
+
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	http.HandleFunc("/api/sudoku/easy", easyHandler)
-	http.HandleFunc("/api/sudoku/normal", normalHandler)
-	http.HandleFunc("/api/sudoku/hard", hardHandler)
+	http.HandleFunc("/api/sudoku/easy", enableCORS(easyHandler))
+	http.HandleFunc("/api/sudoku/normal", enableCORS(normalHandler))
+	http.HandleFunc("/api/sudoku/hard", enableCORS(hardHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {
