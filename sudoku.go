@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -149,13 +148,10 @@ func main() {
 	http.HandleFunc("/api/sudoku/easy", easyHandler)
 	http.HandleFunc("/api/sudoku/normal", normalHandler)
 	http.HandleFunc("/api/sudoku/hard", hardHandler)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	fmt.Println("Server running on port", port)
-
-	http.ListenAndServe(":"+port, nil)
+	fs := http.FileServer(http.Dir("D:/MyFrontend/Sudoku"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "D:/MyFrontend/Sudoku/sudoku.html")
+	})
+	fmt.Println("Server running at http://localhost:8080")
 }
