@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -142,7 +143,24 @@ func hardHandler(w http.ResponseWriter, r *http.Request) {
 	board := generateSudoku(28)
 	writeJSON(w, board)
 }
+func main() {
+	rand.Seed(time.Now().UnixNano())
 
+	http.HandleFunc("/api/sudoku/easy", easyHandler)
+	http.HandleFunc("/api/sudoku/normal", normalHandler)
+	http.HandleFunc("/api/sudoku/hard", hardHandler)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	fmt.Println("Server running on port", port)
+
+	http.ListenAndServe(":"+port, nil)
+}
+
+/*
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	http.HandleFunc("/api/sudoku/easy", easyHandler)
@@ -151,7 +169,9 @@ func main() {
 	fs := http.FileServer(http.Dir("D:/MyFrontend/Sudoku"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "D:/MyFrontend/Sudoku/sudoku.html")
+		http.ServeFile(w, r, "D:/MyFrontend/Sudoku/index.html")
 	})
 	fmt.Println("Server running at http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }
+*/
